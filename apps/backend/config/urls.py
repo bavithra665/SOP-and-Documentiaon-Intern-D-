@@ -16,6 +16,9 @@ urlpatterns = [
     # Document management
     path("api/documents/", include("apps.documents.urls")),
 
+    # SOP management
+    path("api/sops/", include("apps.sops.urls")),
+
     # Base API routing placeholder
     path("api/", include("apps.core.urls")),
 ]

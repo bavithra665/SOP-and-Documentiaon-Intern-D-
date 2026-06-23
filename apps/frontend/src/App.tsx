@@ -7,6 +7,7 @@ import { Dashboard } from './pages/Dashboard';
 import { Departments } from './pages/Departments';
 import { Users } from './pages/Users';
 import { Documents } from './pages/Documents';
+import { SOPs } from './pages/SOPs';
 import { GlobalLayout } from './components/ui';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { RoleProtectedRoute } from './components/RoleProtectedRoute';
@@ -48,6 +49,7 @@ function App() {
               }
             />
             <Route path="documents" element={<Documents />} />
+            <Route path="sops" element={<SOPs />} />
           </Route>
         </Routes>
       </BrowserRouter>

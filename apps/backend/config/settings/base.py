@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     "apps.common",
     "apps.departments",
     "apps.documents",
+    "apps.sops",
 ]
 
 # Custom User Model

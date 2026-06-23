@@ -86,6 +86,11 @@ export const SOPs: React.FC = () => {
   const handleView = (sop: SOP) => {
     setSelectedSOP(sop);
     setDetailsModalOpen(true);
+    
+    // Auto-mark as read when viewing
+    if (sop.status === 'published') {
+      sopService.readSOP(sop.id).catch(() => {});
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

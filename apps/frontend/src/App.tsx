@@ -8,6 +8,9 @@ import { Departments } from './pages/Departments';
 import { Users } from './pages/Users';
 import { Documents } from './pages/Documents';
 import { SOPs } from './pages/SOPs';
+import { AI } from './pages/AI';
+import { Compliance } from './pages/Compliance';
+import { Quizzes } from './pages/Quizzes';
 import { GlobalLayout } from './components/ui';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { RoleProtectedRoute } from './components/RoleProtectedRoute';
@@ -50,6 +53,9 @@ function App() {
             />
             <Route path="documents" element={<Documents />} />
             <Route path="sops" element={<SOPs />} />
+            <Route path="ai" element={<AI />} />
+            <Route path="compliance" element={<Compliance />} />
+            <Route path="quizzes" element={<Quizzes />} />
           </Route>
         </Routes>
       </BrowserRouter>

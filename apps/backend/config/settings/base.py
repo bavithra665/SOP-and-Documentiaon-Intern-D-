@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     "apps.departments",
     "apps.documents",
     "apps.sops",
+    "apps.ai",
 ]
 
 # Custom User Model
@@ -200,4 +201,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 # File Upload Settings
 MAX_UPLOAD_SIZE = 10 * 1024 * 1024  # 10MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = MAX_UPLOAD_SIZE
+
+# Groq AI Settings
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+GROQ_MODEL = os.getenv("GROQ_MODEL", "llama3-70b-8192")
 

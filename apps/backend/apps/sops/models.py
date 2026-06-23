@@ -100,3 +100,94 @@ class SOP(models.Model):
             self.status = SOPStatus.PUBLISHED
             self.published_at = timezone.now()
             self.save()
+
+
+class SOPCompliance(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='sop_compliances'
+    )
+    sop = models.ForeignKey(
+        SOP,
+        on_delete=models.CASCADE,
+        related_name='compliances'
+    )
+    read_at = models.DateTimeField(null=True, blank=True)
+    acknowledged_at = models.DateTimeField(null=True, blank=True)
+    acknowledged = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ['user', 'sop']
+        ordering = ['-created_at']
+        verbose_name = 'SOP Compliance'
+        verbose_name_plural = 'SOP Compliances'
+
+    def __str__(self):
+        return f"{self.user.username} - {self.sop.title}"
+
+    def mark_as_read(self):
+        if not self.read_at:
+            self.read_at = timezone.now()
+            self.save()
+
+    def acknowledge(self):
+        self.acknowledged = True
+        self.acknowledged_at = timezone.now()
+        if not self.read_at:
+            self.read_at = timezone.now()
+        self.save()
+
+
+class Quiz(models.Model):
+    sop = models.ForeignKey(
+        SOP,
+        on_delete=models.CASCADE,
+        related_name='quizzes'
+    )
+    title = models.CharField(max_length=255)
+    questions = models.JSONField(default=list)  # List of {question, options, correct_answer}
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='created_quizzes'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Quiz'
+        verbose_name_plural = 'Quizzes'
+
+    def __str__(self):
+        return f"{self.title} - {self.sop.title}"
+
+
+class QuizResult(models.Model):
+    quiz = models.ForeignKey(
+        Quiz,
+        on_delete=models.CASCADE,
+        related_name='results'
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='quiz_results'
+    )
+    score = models.IntegerField()
+    total_questions = models.IntegerField()
+    percentage = models.FloatField()
+    answers = models.JSONField(default=list)  # User's answers
+    completed_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-completed_at']
+        verbose_name = 'Quiz Result'
+        verbose_name_plural = 'Quiz Results'
+
+    def __str__(self):
+        return f"{self.user.username} - {self.quiz.title} ({self.percentage}%)"

@@ -1,10 +1,9 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import SOPViewSet, QuizViewSet
+from .views import AIViewSet
 
 router = DefaultRouter()
-router.register(r'sops', SOPViewSet, basename='sop')
-router.register(r'quizzes', QuizViewSet, basename='quiz')
+router.register(r'ai', AIViewSet, basename='ai')
 
 urlpatterns = [
     path('', include(router.urls)),

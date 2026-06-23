@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.core.exceptions import ValidationError
 from django.utils import timezone
-from .models import SOP, SOPStatus
+from .models import SOP, SOPStatus, SOPCompliance, Quiz, QuizResult
 
 
 class SOPSerializer(serializers.ModelSerializer):
@@ -116,3 +116,105 @@ class SOPPublishSerializer(serializers.Serializer):
         if value and value < timezone.now().date():
             raise ValidationError("Effective date cannot be in the past.")
         return value
+
+
+class SOPComplianceSerializer(serializers.ModelSerializer):
+    user_name = serializers.SerializerMethodField()
+    sop_title = serializers.SerializerMethodField()
+    sop_department_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = SOPCompliance
+        fields = [
+            'id', 'user', 'user_name', 'sop', 'sop_title', 'sop_department_name',
+            'read_at', 'acknowledged_at', 'acknowledged', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at']
+
+    def get_user_name(self, obj):
+        return obj.user.get_full_name() or obj.user.username
+
+    def get_sop_title(self, obj):
+        return obj.sop.title
+
+    def get_sop_department_name(self, obj):
+        return obj.sop.department.name if obj.sop.department else None
+
+
+class ComplianceAnalyticsSerializer(serializers.Serializer):
+    total_sops = serializers.IntegerField()
+    read_sops = serializers.IntegerField()
+    acknowledged_sops = serializers.IntegerField()
+    pending_sops = serializers.IntegerField()
+    compliance_percentage = serializers.FloatField()
+    read_percentage = serializers.FloatField()
+    department_compliance = serializers.ListField(child=serializers.DictField())
+
+
+class QuizSerializer(serializers.ModelSerializer):
+    sop_title = serializers.SerializerMethodField()
+    sop_department_name = serializers.SerializerMethodField()
+    created_by_name = serializers.SerializerMethodField()
+    question_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Quiz
+        fields = [
+            'id', 'sop', 'sop_title', 'sop_department_name', 'title', 'questions',
+            'question_count', 'created_by', 'created_by_name', 'created_at', 'is_active'
+        ]
+        read_only_fields = ['id', 'created_by', 'created_at']
+
+    def get_sop_title(self, obj):
+        return obj.sop.title
+
+    def get_sop_department_name(self, obj):
+        return obj.sop.department.name if obj.sop.department else None
+
+    def get_created_by_name(self, obj):
+        return obj.created_by.get_full_name() if obj.created_by else None
+
+    def get_question_count(self, obj):
+        return len(obj.questions) if obj.questions else 0
+
+
+class QuizCreateSerializer(serializers.Serializer):
+    sop_id = serializers.IntegerField(required=True)
+    num_questions = serializers.IntegerField(default=5, min_value=1, max_value=20)
+
+
+class QuizSubmitSerializer(serializers.Serializer):
+    answers = serializers.ListField(child=serializers.IntegerField(), required=True)
+
+
+class QuizResultSerializer(serializers.ModelSerializer):
+    quiz_title = serializers.SerializerMethodField()
+    sop_title = serializers.SerializerMethodField()
+    user_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = QuizResult
+        fields = [
+            'id', 'quiz', 'quiz_title', 'sop_title', 'user', 'user_name',
+            'score', 'total_questions', 'percentage', 'answers', 'completed_at'
+        ]
+        read_only_fields = ['id', 'score', 'total_questions', 'percentage', 'completed_at']
+
+    def get_quiz_title(self, obj):
+        return obj.quiz.title
+
+    def get_sop_title(self, obj):
+        return obj.quiz.sop.title
+
+    def get_user_name(self, obj):
+        return obj.user.get_full_name() or obj.user.username
+
+
+class QuizAnalyticsSerializer(serializers.Serializer):
+    total_quizzes = serializers.IntegerField()
+    total_attempts = serializers.IntegerField()
+    average_score = serializers.FloatField()
+    average_percentage = serializers.FloatField()
+    pass_rate = serializers.FloatField()
+    department_performance = serializers.ListField(child=serializers.DictField())
+    recent_results = serializers.ListField(child=serializers.DictField())

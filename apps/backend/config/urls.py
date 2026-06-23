@@ -19,6 +19,9 @@ urlpatterns = [
     # SOP management
     path("api/sops/", include("apps.sops.urls")),
 
+    # AI features
+    path("api/", include("apps.ai.urls")),
+
     # Base API routing placeholder
     path("api/", include("apps.core.urls")),
 ]
